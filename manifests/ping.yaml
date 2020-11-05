@@ -22,3 +22,29 @@ spec:
           volumeMounts: # Mount volume
           - name: shared-image
             mountPath: /home/ec2-user/environment
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ping-pong-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: ping-pong
+  ports:
+    - port: 6789
+      protocol: TCP
+      targetPort: 9936
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ping-pong-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: ping-pong-svc
+          servicePort: 6789
