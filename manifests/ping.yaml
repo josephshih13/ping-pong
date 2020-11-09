@@ -12,16 +12,9 @@ spec:
       labels:
         app: ping-pong
     spec:
-      volumes: # Define volume
-        - name: shared-image
-          persistentVolumeClaim:
-            claimName: image-claim
       containers:
         - name: ping-pong
           image: josephshih13/ping-pong
-          volumeMounts: # Mount volume
-          - name: shared-image
-            mountPath: /home/ec2-user/environment
 ---
 apiVersion: v1
 kind: Service
@@ -40,13 +33,15 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: ping-pong-ingress
-  annotations:
-    traefik.ingress.kubernetes.io/rule-type: "PathPrefixStrip"
 spec:
   rules:
   - http:
       paths:
       - path: /pong
+        backend:
+          serviceName: ping-pong-svc
+          servicePort: 6789
+      - path: /internal
         backend:
           serviceName: ping-pong-svc
           servicePort: 6789
